@@ -1,4 +1,3 @@
-// src/Components/ActorsList.jsx
 import React, { useState } from "react";
 import "./ActorsList.css";
 
@@ -7,7 +6,7 @@ const ActorsList = ({ actors, onSelect }) => {
 
   const handleSelect = (id) => {
     setSelectedId(id);
-    onSelect(id); // ✅ Call the parent
+    onSelect(id);
   };
 
   if (!actors.length) {

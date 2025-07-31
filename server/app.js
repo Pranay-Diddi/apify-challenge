@@ -1,11 +1,10 @@
 const express = require('express');
 const cors = require('cors');
-const axios = require('axios'); // ✅ You missed this import
+const axios = require('axios'); 
 require('dotenv').config();
 
 const app = express();
 
-// ✅ FIX 1: You forgot to *call* cors() — this line was incorrect before
 app.use(cors()); 
 
 app.use(express.json());
@@ -31,7 +30,6 @@ app.get("/actors/:username/:actorName/schema", async (req, res) => {
       return res.status(404).json({ error: "Build ID not found." });
     }
 
-    // Step 2: Use buildId to get input schema
     const buildDetailsRes = await axios.get(
       `https://api.apify.com/v2/actor-builds/${buildId}`,
     );
@@ -75,9 +73,8 @@ app.post("/actors/:username/:actorName/run", async (req, res) => {
     );
 
     const { id: runId, defaultDatasetId } = startRun.data.data;
-    console.log(`✅ Started actor run: ${runId}`);
+    // console.log(`✅ Started actor run: ${runId}`);
 
-    // 2. Poll for completion
     let runStatus = "READY";
     let maxPolls = 30;
     let pollInterval = 2000;
@@ -107,8 +104,7 @@ app.post("/actors/:username/:actorName/run", async (req, res) => {
     if (runStatus !== "SUCCEEDED") {
       throw new Error(`Actor run did not complete in time (status: ${runStatus})`);
     }
-
-    // 3. Fetch output dataset
+    
     const datasetFetch = await axios.get(
       `https://api.apify.com/v2/datasets/${defaultDatasetId}/items`,
       {
@@ -117,7 +113,6 @@ app.post("/actors/:username/:actorName/run", async (req, res) => {
       }
     );
 
-    // 4. Send results
     res.json({ items: datasetFetch.data });
 
   } catch (err) {
@@ -140,16 +135,14 @@ app.get("/actors", async (req, res) => {
   }
 
   try {
-    // Step 1: Validate API key by calling /users/me
     const userRes = await axios.get("https://api.apify.com/v2/users/me", {
       headers: {
         Authorization: `Bearer ${apiKey}`,
       },
     });
 
-    const userData = userRes.data.data; // Optional: use this info if needed
+    // const userData = userRes.data.data; 
 
-    // Step 2: Fetch actors if API key is valid
     const result = await axios.get("https://api.apify.com/v2/acts", {
       headers: {
         Authorization: `Bearer ${apiKey}`,
@@ -159,7 +152,7 @@ app.get("/actors", async (req, res) => {
     res.json(result.data);
   } catch (err) {
     if (err.response) {
-      // Handle known errors
+      
       const status = err.response.status;
       const message = err.response.data?.message || err.message;
 
@@ -170,7 +163,6 @@ app.get("/actors", async (req, res) => {
       return res.status(status).json({ error: "❌ Failed to fetch actors", details: message });
     }
 
-    // Handle unknown or network errors
     res.status(500).json({ error: "❌ Server error", details: err.message });
   }
 });
