@@ -132,13 +132,6 @@ app.post("/actors/:username/:actorName/run", async (req, res) => {
 
 
 
-
-
-
-
-// ✅ RECOMMENDED: Use env file for security
-// const apiKey = "apify_api_QW0OvAu2mX2usM8My6510LU5uCn0gl1TdXnX";
-
 app.get("/actors", async (req, res) => {
   const apiKey = req.headers.authorization?.split(" ")[1];
 
